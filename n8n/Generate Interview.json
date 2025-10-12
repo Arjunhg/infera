@@ -1,0 +1,644 @@
+{
+  "name": "Generate Interview",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-interview-question",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -864,
+        -256
+      ],
+      "id": "e664855c-cc94-41d1-bebc-63c302f8ed81",
+      "name": "Webhook",
+      "webhookId": "1292d30b-70c4-4414-a465-3889de3ef7f9"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -592
+      ],
+      "id": "16cbda34-a5dd-4fe8-b796-dd8673bd268d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Generate 10 Interview question with their answer depending on user resume data provided by user. Make sure response will be in question and answer field.\n\nMAKE SURE TO STRICLTY FOLLOW THE GIVEN BELOW FORMAT AND NOTHING ELSE BESIDES IT, IT SHOULD BE IN PROPER JSON AS SHOULD BELOW WITH NO OTHER TYPES LIKE STRING, THAT\"S STRICLY PROHIBITED\n\nMake sure the key for the array of interview questions and answer object is stricly \"interview_questions\" and nothing else.\n\nFor example:\n[\n    {\n        \"index\": 0,\n        \"message\": {\n            \"role\": \"assistant\",\n            \"content\": {\n                \"interview_questions\": [\n                    {\n                        \"question\": \"\",\n                        \"answer\": \"\"\n                    }\n                ]\n            }\n        }\n    }\n]\n\nImportant: Do not wrap the above example in any additional or originally returned structure. It's just an example of how the key should be \"interview_questions\" only and not to be confused for nesting it inside the orignal response",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.snippets.join('\\n') }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1600,
+        -384
+      ],
+      "id": "2df5951d-579b-439a-8b8f-6a1043fa3ea8",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0d8snwA1h5F0tbTa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1760,
+        -592
+      ],
+      "id": "16d1caf4-2444-4029-9c1b-8d7fcf299fe4",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ec71f64-6e62-421b-8448-2470a549072c",
+              "leftValue": "={{ $json.body.resumeUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        -256
+      ],
+      "id": "ee0cb681-12ee-4e84-8709-32198bb1aa8d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Depends on User Job Title and Job Description, generate 10 interview questions. Give me question and answer inside questions object list with field question and answer.\n\nMake sure the key for the array of interview questions and answer object is stricly \"questions\" and nothing else.\n\nFor example:\n[\n    {\n        \"index\": 0,\n        \"message\": {\n            \"role\": \"assistant\",\n            \"content\": {\n                \"questions\": [\n                    {\n                        \"question\": \"\",\n                        \"answer\": \"\"\n                    }\n                ]\n            }\n        }\n    }\n]\n\nImportant: Do not wrap the above example in any additional or originally returned structure. It's just an example of how the key should be \"questions\" only and not to be confused for nesting it inside the orignal response",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.snippets.join('\\n') }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        496,
+        96
+      ],
+      "id": "60702a80-daa9-43a5-bf05-687ea5c7bacf",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "0d8snwA1h5F0tbTa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        -144
+      ],
+      "id": "0510f76e-91dc-4678-b45d-a8a2cbc2ba7a",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get search results\nconst searchData = $input.item.json;\nconst organicResults = searchData.organic_results || [];\n\n// Get resume data from the Parse Resume node\nconst resumeNode = $('Code in JavaScript'); // Adjust to your actual node name\nconst resumeData = resumeNode.item.json;\n\n// Extract search context\nconst searchContext = organicResults\n  .slice(0, 5)\n  .map((result, index) => `Source ${index + 1}: ${result.title}\\n${result.snippet}`)\n  .join('\\n\\n');\n\n// Build the API request\nreturn {\n  json: {\n    model: \"llama3.1-8b\",\n    stream: false,\n    messages: [\n      {\n        role: \"system\",\n        content: `You are an expert technical interviewer. Generate EXACTLY 10 interview questions with detailed answers.\n\nCRITICAL: Return ONLY a valid JSON object with this EXACT structure:\n{\n  \"interview_questions\": [\n    {\n      \"question\": \"question text\",\n      \"answer\": \"detailed answer text\"\n    }\n  ]\n}\n\nRules:\n- MUST return valid JSON object (not array, not string)\n- MUST use key \"interview_questions\" (not \"questions\", not anything else)\n- MUST include exactly 10 question-answer pairs\n- No markdown, no code blocks, no extra text\n- Questions should be specific to ${resumeData.jobTitle} with ${resumeData.yoe} years experience\n- Focus on: ${resumeData.keywords.slice(0, 3).join(', ')}\n- Mix technical knowledge, problem-solving, and real-world scenarios\n- Answers should be comprehensive and demonstrate expert-level knowledge`\n      },\n      {\n        role: \"user\",\n        content: `Generate 10 interview questions with detailed answers for:\nRole: ${resumeData.jobTitle}\nExperience: ${resumeData.yoe} years\nKey Skills: ${resumeData.keywords.join(', ')}\n\nUse these reference materials:\n${searchContext}\n\nReturn ONLY the JSON object with \"interview_questions\" key.`\n      }\n    ],\n    max_completion_tokens: 2500,\n    temperature: 0.7,\n    top_p: 0.9,\n    seed: 0\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        -592
+      ],
+      "id": "c82ee80b-9530-4da6-ba2d-bdc014679cd1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the extracted snippets from previous node\nconst snippetsData = $input.item.json;\nconst snippets = snippetsData.snippets || [];\n\n// Get job data from If node (adjust if needed)\nconst ifNode = $('If');\nconst inputData = ifNode.item.json;\n\n// Determine job details\nlet jobTitle, jobDescription;\n\nif (inputData.body) {\n  // Custom entry path\n  jobTitle = inputData.body.jobTitle || 'Unknown Position';\n  jobDescription = inputData.body.jobDescription || 'No description provided';\n} else {\n  // Resume path (if you want to support it)\n  jobTitle = inputData.jobTitle || 'Unknown Position';\n  jobDescription = `${inputData.yoe || 0} years of experience in ${(inputData.keywords || []).join(', ')}`;\n}\n\n// Combine snippets into context\nconst searchContext = snippets\n  .filter(s => s && s.trim().length > 0)\n  .map((snippet, index) => `${index + 1}. ${snippet}`)\n  .join('\\n\\n');\n\n// Build the Cerebras API request\nreturn {\n  json: {\n    model: \"llama3.1-8b\",\n    stream: false,\n    messages: [\n      {\n        role: \"system\",\n        content: `You are an expert technical interviewer. Generate EXACTLY 10 interview questions with detailed answers based on the job title and description provided.\n\nCRITICAL: Return ONLY a valid JSON object with this EXACT structure:\n{\n  \"questions\": [\n    {\n      \"question\": \"question text\",\n      \"answer\": \"detailed answer text\"\n    }\n  ]\n}\n\nSTRICT RULES:\n- MUST return valid JSON object (not array, not string)\n- MUST use key \"questions\" (NOT \"interview_questions\", NOT anything else)\n- MUST include exactly 10 question-answer pairs\n- No markdown, no code blocks, no extra text\n- Questions should be relevant to the job title and experience level\n- Mix technical knowledge, problem-solving, and real-world scenarios\n- Answers should be comprehensive and demonstrate expert-level knowledge`\n      },\n      {\n        role: \"user\",\n        content: `Generate 10 interview questions with detailed answers for:\nJob Title: ${jobTitle}\nJob Description: ${jobDescription}\n\nUse these interview resources as reference:\n${searchContext}\n\nReturn ONLY the JSON object with \"questions\" key containing 10 question-answer pairs.`\n      }\n    ],\n    max_completion_tokens: 2500,\n    temperature: 0.7,\n    top_p: 0.9,\n    seed: 0\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "571049ae-9f41-4cad-b390-fe7a3a2f8c23",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.resumeUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -32,
+        -592
+      ],
+      "id": "7a90067b-d3ff-4a71-bf0b-aa35f2d86547",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -1392
+      ],
+      "id": "4b29c158-75ac-4140-80aa-97830b248c7f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "q": "={{ $json.jobTitle }} technical interview questions covering {{ $json.keywords.slice(0, 3).join(', ') }} for {{ $json.yoe }}+ years experience\n",
+        "locationSettings": {},
+        "languageSettings": {},
+        "searchOptions": {},
+        "timeFilters": {},
+        "pagination": {
+          "num": "10"
+        },
+        "advancedOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@searchapi/n8n-nodes-searchapi.searchApi",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -592
+      ],
+      "id": "a49902a2-c349-4ca0-8731-9f07f3817a05",
+      "name": "Search google",
+      "credentials": {
+        "searchApi": {
+          "id": "FgfNEgPz9yqDdGVH",
+          "name": "SearchApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "q": "=Search for questions related to  {{ $json.body.jobTitle }} and {{ $json.body.jobDescription }}",
+        "locationSettings": {},
+        "languageSettings": {},
+        "searchOptions": {},
+        "timeFilters": {},
+        "pagination": {},
+        "advancedOptions": {
+          "kgmid": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "@searchapi/n8n-nodes-searchapi.searchApi",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -144
+      ],
+      "id": "a35764db-693f-4fb2-9eaf-88c5fd8e50bb",
+      "name": "Search google1",
+      "credentials": {
+        "searchApi": {
+          "id": "FgfNEgPz9yqDdGVH",
+          "name": "SearchApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extract the following fields from {{ $json.text }}:\n\n- jobTitle: The primary or most recent job title.\n- yoe: Total years of professional experience (YOE).\n- keywords: List of up to 5 relevant skills or technologies found in the resume.\n\nReturn your answer strictly in the following JSON format only with no other fields:\n{\n  \"jobTitle\": \"...\",\n  \"yoe\": ...,\n  \"keywords\": [ ... ]\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        512,
+        -848
+      ],
+      "id": "422fca75-e037-4f7b-8014-29c5132cabf1",
+      "name": "Message a model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "0d8snwA1h5F0tbTa",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3.1-8b\",\n  \"stream\": false,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert resume analyzer. Analyze ONLY the first resume if multiple are provided. Return ONLY a single valid JSON object with no additional text or markdown. Format: {\\\"jobTitle\\\": \\\"string\\\", \\\"yoe\\\": number, \\\"keywords\\\": [\\\"string\\\", \\\"string\\\", \\\"string\\\", \\\"string\\\", \\\"string\\\"]}.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.text) }}\n    }\n  ],\n  \"max_completion_tokens\": 300,\n  \"temperature\": 0.1,\n  \"top_p\": 0.9,\n  \"seed\": 0\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -592
+      ],
+      "id": "56217d32-9ab7-4f56-bb21-ff8d7571f709",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "AlGIvyqDCh4CJlOa",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract the API response\nconst response = $input.item.json;\nconst content = response.choices?.[0]?.message?.content || '';\n\ntry {\n  // Parse the JSON from the content\n  const parsed = JSON.parse(content);\n  \n  // Validate and clean the data\n  return {\n    json: {\n      jobTitle: parsed.jobTitle || 'Not specified',\n      yoe: parseInt(parsed.yoe) || 0,\n      keywords: Array.isArray(parsed.keywords) \n        ? parsed.keywords.slice(0, 5)  // Limit to 5 keywords\n        : []\n    }\n  };\n} catch (error) {\n  // If parsing fails, return error with details\n  return {\n    json: {\n      error: 'Failed to parse response',\n      raw_content: content,\n      jobTitle: 'Error',\n      yoe: 0,\n      keywords: []\n    }\n  };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -592
+      ],
+      "id": "855ceb7c-6ecb-4985-be28-dccc5a0cab24",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        -592
+      ],
+      "id": "d38412b8-ce89-4f4a-ac57-7a1dc588c0a6",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "AlGIvyqDCh4CJlOa",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract API response\nconst response = $input.item.json;\nconst content = response.choices?.[0]?.message?.content || '';\n\ntry {\n  // Remove markdown code blocks if present\n  let cleaned = content\n    .replace(/^```(?:json)?\\s*|```$/g, '') // Remove leading/trailing ``` or ```json\n    .trim();\n  \n  // Parse the JSON\n  let parsed = JSON.parse(cleaned);\n  \n  // Extract interview_questions\n  let interviewQuestions;\n  \n  if (parsed.interview_questions && Array.isArray(parsed.interview_questions)) {\n    interviewQuestions = parsed.interview_questions;\n  } else if (Array.isArray(parsed)) {\n    // If model returned array directly\n    interviewQuestions = parsed;\n  } else {\n    throw new Error('interview_questions key not found');\n  }\n  \n  // Validate and ensure exactly 10 questions\n  const validQuestions = interviewQuestions\n    .filter(q => q.question && q.answer)\n    .slice(0, 10)\n    .map(q => ({\n      question: String(q.question).trim(),\n      answer: String(q.answer).trim()\n    }));\n  \n  // Ensure we have at least some questions\n  if (validQuestions.length === 0) {\n    throw new Error('No valid questions found in response');\n  }\n  \n  // Return in the exact format\n  return {\n    json: {\n      interview_questions: validQuestions,\n      totalQuestions: validQuestions.length\n    }\n  };\n  \n} catch (error) {\n  console.error('Parse error:', error.message);\n  console.log('Raw content:', content.substring(0, 500));\n  \n  // Fallback: Try regex extraction\n  const questionRegex = /\"question\":\\s*\"([^\"]+)\"(?:[^}]*)\"answer\":\\s*\"([^\"]+)\"/g;\n  const fallbackQuestions = [];\n  let match;\n  \n  while ((match = questionRegex.exec(content)) !== null && fallbackQuestions.length < 10) {\n    fallbackQuestions.push({\n      question: match[1].replace(/\\\\n/g, ' ').replace(/\\\\/g, ''),\n      answer: match[2].replace(/\\\\n/g, ' ').replace(/\\\\/g, '')\n    });\n  }\n  \n  if (fallbackQuestions.length > 0) {\n    return {\n      json: {\n        interview_questions: fallbackQuestions,\n        totalQuestions: fallbackQuestions.length,\n        warning: 'Used fallback parsing'\n      }\n    };\n  }\n  \n  // Last resort: return error\n  return {\n    json: {\n      interview_questions: [],\n      error: `Parse failed: ${error.message}`,\n      raw_response: content.substring(0, 1000)\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -592
+      ],
+      "id": "f2241b9f-0a76-48a9-910d-80b40548c0c2",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "8dbb0971-8500-4172-a496-c82f3372a62c",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "AlGIvyqDCh4CJlOa",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract API response (runOnceForAllItems mode)\nconst response = $input.first().json;\n\nconst content = response.choices?.[0]?.message?.content || '';\n\ntry {\n  // Remove markdown code fences (```...```\n  let cleaned = content\n    .replace(/```(?:[\\s\\S]*?)```/g, '') // Remove all tripple-backtick code blocks\n    .replace(/```/g, '') // Remove any stray triple backticks\n    .trim();\n  \n  // Parse the JSON\n  let parsed = JSON.parse(cleaned);\n  \n  // Extract questions array\n  let questions;\n  \n  if (parsed.questions && Array.isArray(parsed.questions)) {\n    questions = parsed.questions;\n  } else if (parsed.interview_questions && Array.isArray(parsed.interview_questions)) {\n    // Handle if model used wrong key name\n    questions = parsed.interview_questions;\n  } else if (Array.isArray(parsed)) {\n    // If it returned array directly\n    questions = parsed;\n  } else {\n    throw new Error('questions key not found');\n  }\n  \n  // Validate and ensure exactly 10 questions\n  const validQuestions = questions\n    .filter(q => q.question && q.answer)\n    .slice(0, 10)\n    .map(q => ({\n      question: String(q.question).trim(),\n      answer: String(q.answer).trim()\n    }));\n  \n  // Ensure we have questions\n  if (validQuestions.length === 0) {\n    throw new Error('No valid questions found in response');\n  }\n  \n  // Return in the EXACT format you specified\n  return {\n    json: {\n      questions: validQuestions\n    }\n  };\n  \n} catch (error) {\n  console.error('Parse error:', error.message);\n  console.log('Raw content:', content.substring(0, 500));\n  \n  // Fallback: Try regex extraction\n  const questionRegex = /\"question\":\\s*\"([^\"]+)\"(?:[^}]*)\"answer\":\\s*\"([^\"]+)\"/g;\n  const fallbackQuestions = [];\n  let match;\n  \n  while ((match = questionRegex.exec(content)) !== null && fallbackQuestions.length < 10) {\n    fallbackQuestions.push({\n      question: match[1].replace(/\\\\n/g, ' ').replace(/\\\\/g, ''),\n      answer: match[2].replace(/\\\\n/g, ' ').replace(/\\\\/g, '')\n    });\n  }\n  \n  if (fallbackQuestions.length > 0) {\n    return {\n      json: {\n        questions: fallbackQuestions\n      }\n    };\n  }\n  \n  // Last resort: return error\n  return {\n    json: {\n      questions: [],\n      error: `Parse failed: ${error.message}`,\n      raw_response: content.substring(0, 1000)\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -144
+      ],
+      "id": "fbd1b094-82ed-4621-b487-fab4fc857a14",
+      "name": "Code in JavaScript2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search google1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        []
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search google": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search google1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model3": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Search google",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a6e68725-6650-4b22-94c4-c5292cb23d57",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "009704cae9e8622ab6c7fc6e288a4d8d739fd1c90f763048e5863426513e262c"
+  },
+  "id": "hhISMrSt6RS0ksb8",
+  "tags": []
+}

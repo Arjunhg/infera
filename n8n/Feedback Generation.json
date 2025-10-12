@@ -1,0 +1,130 @@
+{
+  "name": "Feedback Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "38a13183-51d2-44c0-9e3b-9aad76569cb2",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "889b10f7-aa6a-4fea-b3ec-848042e674d1",
+      "name": "Webhook",
+      "webhookId": "38a13183-51d2-44c0-9e3b-9aad76569cb2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        0
+      ],
+      "id": "a5a83049-190d-4f1b-a0fe-f968b171eb05",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cerebras.ai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-oss-120b\",\n  \"stream\": false,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an interview feedback analyzer. You MUST respond ONLY with valid JSON in this exact format:\\n\\n{\\n  \\\"feedback\\\": \\\"<Detailed feedback on the interview>\\\",\\n  \\\"suggestion\\\": \\\"<Suggestions for improvement>\\\",\\n  \\\"rating\\\": <1-10 number>\\n}\\n\\nDo not include any markdown formatting, code blocks, or additional text. Return only the raw JSON object.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Based on the provided interview conversation messages, generate a detailed feedback report:\\n\\nInterview conversation:\\n{{ JSON.parse($json.body.message).map(m => `${m.from}: ${m.text}`).join('\\\\n') }}\\n\\nProvide:\\n1. Comprehensive feedback analyzing strengths and weaknesses\\n2. Specific suggestions for improvement\\n3. Overall rating from 1-10\"\n    }\n  ],\n  \"temperature\": 0,\n  \"max_completion_tokens\": 1000,\n  \"seed\": 0,\n  \"top_p\": 1\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "418ea2af-9899-4bae-b013-5e10287d684e",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "AlGIvyqDCh4CJlOa",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract the content from Cerebras API response\nconst response = $input.item.json;\nconst messageContent = response.choices[0].message.content;\n\ntry {\n  // Try to parse as JSON\n  const parsed = JSON.parse(messageContent);\n  \n  return {\n    json: {\n      feedback: parsed.feedback,\n      suggestion: parsed.suggestion,\n      rating: parsed.rating\n    }\n  };\n} catch (error) {\n  // If parsing fails, try to extract JSON from markdown code blocks\n  const jsonMatch = messageContent.match(/``````/);\n  \n  if (jsonMatch) {\n    const parsed = JSON.parse(jsonMatch[1]);\n    return {\n      json: {\n        feedback: parsed.feedback,\n        suggestion: parsed.suggestion,\n        rating: parsed.rating\n      }\n    };\n  }\n  \n  // Fallback: return raw content with error\n  return {\n    json: {\n      error: \"Failed to parse JSON response\",\n      raw_content: messageContent,\n      feedback: null,\n      suggestion: null,\n      rating: null\n    }\n  };\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        0
+      ],
+      "id": "afd07cc4-60f7-42c6-b48f-af51ebbd288b",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "caaaa546-ac6e-42e5-98df-9ea01150706f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "009704cae9e8622ab6c7fc6e288a4d8d739fd1c90f763048e5863426513e262c"
+  },
+  "id": "u9F5pUuX7EOA9GVC",
+  "tags": []
+}
