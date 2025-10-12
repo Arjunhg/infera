@@ -9,7 +9,6 @@ export async function POST(request: NextRequest){
         const result = await axios.post(process.env.N8N_FEEDBACK_URL || '', {
             message: JSON.stringify(conversation)
         })
-        console.log("result",result);
         // Extract feedback from nested structure: result.data.message.content
         const feedback = result.data;
 

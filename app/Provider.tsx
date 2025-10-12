@@ -19,13 +19,11 @@ function Provider({children}: {children: ReactNode}) {
   const CreateNewUser = async () => {
     if(user){
         try {
-          console.log("Creating/fetching user for:", user.primaryEmailAddress?.emailAddress);
           const result = await CreateUser({
             email: user?.primaryEmailAddress?.emailAddress || '',
             imageUrl: user?.imageUrl || '',
             name: user?.fullName || ''
           })
-          // console.log("User result from Convex:", result);
           setUserDetails(result);
         } catch (error) {
           console.error("Error creating/fetching user:", error);

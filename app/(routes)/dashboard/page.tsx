@@ -19,8 +19,6 @@ function Dashboard() {
     const convex = useConvex();
 
 
-    // console.log(setInterviewList);
-
     const getInterviewList = async() => {
       try {
           setLoading(true);
@@ -41,7 +39,6 @@ function Dashboard() {
               }
             );
             setInterviewList(transformedList);
-            // console.log("Interview List:", transformedList);
           }
       } catch (error) {
         console.error("Error fetching interview list:", error);

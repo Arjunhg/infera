@@ -134,9 +134,6 @@ const CreateInterviewDialog = () => {
                 return ;
             }
             
-            console.log("API response: ", result.data);
-            console.log("Interview questions from API: ", result.data?.interviewQuestions);
-            console.log("Interview questions length: ", result.data?.interviewQuestions?.length);
             
             const response = await saveInterviewQuestion({
                 interviewQuestions: result.data?.interviewQuestions,
@@ -145,7 +142,6 @@ const CreateInterviewDialog = () => {
                 jobDescription: formData?.jobDescription || undefined,
                 uid: userContext?.userDetails?._id
             })
-            console.log("Saved interview session: ", response); // this id will be used for redirecting user to the interview session
             toast.success("Interview created successfully!");
             router.push('/interview/' + response)
         } catch (error) {

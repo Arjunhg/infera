@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AssemblyAI } from 'assemblyai';
 
 export async function POST(request: NextRequest) {
-  console.log('🔥 AssemblyAI route called - Creating temporary token');
   
   try {
     const { action } = await request.json();
@@ -17,7 +16,6 @@ export async function POST(request: NextRequest) {
         expires_in_seconds: 600, // 10 minutes (maximum allowed)
       });
 
-      console.log('✅ AssemblyAI temporary token created successfully');
       
       return NextResponse.json({
         token: token,

@@ -37,11 +37,9 @@ export class AssemblyAISpeechService {
       }
 
       const { token } = await response.json();
-      console.log('Got AssemblyAI token, connecting to Universal-Streaming v3...');
 
       // Updated endpoint URL for Universal-Streaming v3
       const wsUrl = `wss://streaming.assemblyai.com/v3/ws?sample_rate=16000&encoding=pcm_s16le&token=${token}`;
-      console.log('Attempting AssemblyAI v3 connection to:', wsUrl);
 
       this.socket = new WebSocket(wsUrl);
       this.socket.binaryType = 'arraybuffer'; // CRITICAL: Set binary type for PCM data

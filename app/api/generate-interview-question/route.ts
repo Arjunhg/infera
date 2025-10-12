@@ -22,7 +22,7 @@ export async function POST(request: NextRequest){
     const user = await currentUser();
 
     const decision = await aj.protect(request, { userId: user?.primaryEmailAddress?.emailAddress??'', requested: 5 }) //Deduct 5 credits
-    console.log("Decision:", decision)
+
 
     if((decision.reason as ArcjetRateLimitReason).remaining === 0){
         return NextResponse.json({

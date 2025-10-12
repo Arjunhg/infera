@@ -19,7 +19,6 @@ export const CreateNewUser = mutation({
                 name: args.name,
                 imageUrl: args.imageUrl
             })
-            console.log("Created new user with ID:", result);
             return {
                 _id: result,
                 email: args.email,
@@ -28,7 +27,6 @@ export const CreateNewUser = mutation({
             }
         }
 
-        console.log("Returning existing user:", user[0]);
         return user[0];
     }
 })

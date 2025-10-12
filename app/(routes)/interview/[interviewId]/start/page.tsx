@@ -66,15 +66,11 @@ const ContinuousInterview = () => {
       actions.endInterview();
       toast.warning('Generating feedback...');
 
-      console.log("Conversation is: ", state.conversationHistory)
-
       // Generate feedback using the interview feedback API
       const feedbackResponse = await axios.post('/api/interview-feedback', {
         conversation: state.conversationHistory,
       });
 
-      console.log("Feedback Response:", feedbackResponse);
-      console.log("Feedback response data: ", feedbackResponse.data);
 
       // Update feedback in database - n8n returns the feedback object directly
       await updateFeedback({
