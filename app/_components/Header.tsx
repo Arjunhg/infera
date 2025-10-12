@@ -13,7 +13,7 @@ function Header() {
             <Link href={'/'}>
                 <div className="flex items-center gap-2">
                     <Image src={'/logo.svg'} width={40} height={40} alt="logo"/>
-                    <h1 className="text-base font-bold md:text-2xl">infera</h1>
+                    <h1 className="text-base font-bold md:text-2xl">Infera</h1>
                 </div>
             </Link>
             {/* Toggle Theme */}
