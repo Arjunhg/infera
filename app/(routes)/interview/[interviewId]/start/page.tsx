@@ -10,6 +10,8 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { PhoneCall, PhoneOff, User, Bot, AlertCircle, Loader2 } from 'lucide-react';
 import { useInterviewFlow } from '@/hooks/useInterviewFlow';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import type { LanguageConfig } from '@/lib/languageConfig';
 
 const ContinuousInterview = () => {
   const { interviewId } = useParams();
@@ -64,10 +66,11 @@ const ContinuousInterview = () => {
       actions.endInterview();
       toast.warning('Generating feedback...');
 
+      console.log("Conversation is: ", state.conversationHistory)
+
       // Generate feedback using the interview feedback API
       const feedbackResponse = await axios.post('/api/interview-feedback', {
         conversation: state.conversationHistory,
-        interviewQuestions: interviewData?.interviewQuestions
       });
 
       console.log("Feedback Response:", feedbackResponse);
@@ -135,7 +138,17 @@ const ContinuousInterview = () => {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-            <h1 className="text-2xl font-bold">AI Interview Session</h1>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl font-bold">AI Interview Session</h1>
+              <LanguageSelector
+                selectedLanguage={state.selectedLanguage}
+                onLanguageChange={(language: LanguageConfig) => {
+                  actions.setLanguage(language.code, language.voiceId);
+                  toast.success(`Language changed to ${language.name}`);
+                }}
+                disabled={state.isConnected}
+              />
+            </div>
             <div className="flex items-center justify-between mt-2">
               <p className="opacity-90">
                 Question {state.progress.current} of {state.progress.total}

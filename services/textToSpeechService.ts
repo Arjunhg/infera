@@ -1,5 +1,6 @@
 export interface TextToSpeechOptions {
   voiceId?: string;
+  language?: string;
   onSpeechStart?: () => void;
   onSpeechEnd?: () => void;
   onError?: (error: Error) => void;
@@ -9,13 +10,16 @@ export class MurfTextToSpeechService {
   private audioElement: HTMLAudioElement;
   private options: TextToSpeechOptions;
   private isSpeaking = false;
+  private currentLanguage: string;
 
   constructor(audioElement: HTMLAudioElement, options: TextToSpeechOptions = {}) {
     this.audioElement = audioElement;
     this.options = {
       voiceId: 'en-US-terrell',
+      language: 'en',
       ...options
     };
+    this.currentLanguage = this.options.language || 'en';
 
     this.setupAudioElement();
   }
@@ -42,7 +46,7 @@ export class MurfTextToSpeechService {
     });
   }
 
-  async speak(text: string): Promise<void> {
+  async speak(text: string, targetLanguage?: string): Promise<void> {
     if (!text.trim()) {
       throw new Error('Text cannot be empty');
     }
@@ -53,14 +57,38 @@ export class MurfTextToSpeechService {
         this.stop();
       }
 
+      let textToSpeak = text.trim();
+      const languageToUse = targetLanguage || this.currentLanguage;
+
+      // Translate if target language is different from English
+      if (languageToUse !== 'en') {
+        const translationResponse = await fetch('/api/murf-translate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            texts: [text.trim()],
+            targetLanguage: this.getLanguageMurfCode(languageToUse)
+          }),
+        });
+
+        if (translationResponse.ok) {
+          const translationData = await translationResponse.json();
+          if (translationData.translations && translationData.translations.length > 0) {
+            textToSpeak = translationData.translations[0].translated_text;
+          }
+        }
+      }
+
       const response = await fetch('/api/murf-tts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: text.trim(),
-          voiceId: 'en-US-terrell'
+          text: textToSpeak,
+          voiceId: this.options.voiceId || 'en-US-terrell'
         }),
       });
 
@@ -137,6 +165,32 @@ export class MurfTextToSpeechService {
 
   setVoice(voiceId: string): void {
     this.options.voiceId = voiceId;
+  }
+
+  setLanguage(language: string, voiceId?: string): void {
+    this.currentLanguage = language;
+    this.options.language = language;
+    if (voiceId) {
+      this.options.voiceId = voiceId;
+    }
+  }
+
+  private getLanguageMurfCode(languageCode: string): string {
+    const languageMap: Record<string, string> = {
+      'en': 'en-US',
+      'hi': 'hi-IN',
+      'es': 'es-ES',
+      'fr': 'fr-FR',
+      'de': 'de-DE',
+      'it': 'it-IT',
+      'pt': 'pt-BR',
+      'ru': 'ru-RU',
+      'ar': 'ar-SA',
+      'zh': 'zh-CN',
+      'ja': 'ja-JP',
+      'ko': 'ko-KR'
+    };
+    return languageMap[languageCode] || 'en-US';
   }
 
   dispose(): void {

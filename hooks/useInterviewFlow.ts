@@ -16,6 +16,7 @@ export interface InterviewState {
   progress: { current: number; total: number; percentage: number };
   isComplete: boolean;
   error: string | null;
+  selectedLanguage: string;
 }
 
 export interface UseInterviewFlowResult {
@@ -24,6 +25,7 @@ export interface UseInterviewFlowResult {
     startInterview: () => Promise<void>;
     endInterview: () => void;
     retryConnection: () => Promise<void>;
+    setLanguage: (languageCode: string, voiceId: string) => void;
   };
 }
 
@@ -40,7 +42,8 @@ export const useInterviewFlow = (
     currentQuestion: null,
     progress: { current: 0, total: interviewQuestions.length, percentage: 0 },
     isComplete: false,
-    error: null
+    error: null,
+    selectedLanguage: 'en'
   });
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -128,6 +131,7 @@ export const useInterviewFlow = (
       // Initialize TTS service
       ttsServiceRef.current = new MurfTextToSpeechService(audioRef.current, {
         voiceId: 'en-US-terrell',
+        language: 'en',
         onSpeechStart: () => {
           setState(prev => ({ ...prev, isAISpeaking: true }));
         },
@@ -263,6 +267,14 @@ export const useInterviewFlow = (
     await startInterview();
   }, [startInterview, voiceActivity]); // Keep necessary dependencies
 
+  // Set language
+  const setLanguage = useCallback((languageCode: string, voiceId: string) => {
+    setState(prev => ({ ...prev, selectedLanguage: languageCode }));
+    if (ttsServiceRef.current) {
+      ttsServiceRef.current.setLanguage(languageCode, voiceId);
+    }
+  }, []);
+
   // Cleanup on unmount - use ref to avoid dependency issues
   useEffect(() => {
     const cleanup = () => {
@@ -289,7 +301,8 @@ export const useInterviewFlow = (
     actions: {
       startInterview,
       endInterview,
-      retryConnection
+      retryConnection,
+      setLanguage
     }
   };
 };

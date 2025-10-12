@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest){
     try {
-        const { conversation, interviewQuestions } = await request.json();
+        const { conversation } = await request.json();
 
         // Convert conversation array to JSON string to match what n8n expects
         const result = await axios.post(process.env.N8N_FEEDBACK_URL || '', {
